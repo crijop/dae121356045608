@@ -1,0 +1,42 @@
+Sami FTP
+
+Testei em windows xp SP3 Portugues de portugal
+
+Depois de instalar o programa tem que criar um utilizador e uma pass
+
+no codigo metemos "test" e a pass tambem "test" tambem por isso foi isso
+que foi criado no programa
+
+o programa so crasha se tiver a aba dos Logs aberta, (não sabemos porque, mas é so assim que o imunity
+o deteta) 
+
+1. (sami1.py) Eviamos o buffer com 1000 As com o comando LIST
+Parece que é no comando LIST que este programa tem a vulnerabilidade do buffer overflow
+
+2. (sami2.py) Como o programa crashou, com ajuda do backtrack usando o camando patern_creat
+criamos um patern com 1000 bytes
+
+3. (sami3.py) depois onde o programa crasha colocando o hexadeciaml do EIP no comando
+pattern_offset.rb é nos devolvido 216 bytes e foi isso que colocamos no lugar do buffer, e a frente
+colocamos 4 Bs para verificarmos se o EIP (ponto onde crasha) bate certo
+
+4. (sami4.py) Verificado que bate certo fomos no imunity debugger procurar o modulo executavel
+do windows shell 32, e prourar o seu JMP ESP e substituimos os ESP do shell 32 no sitio dos Bs, por ordem 
+inversa, como descrito por causa dos processadores intel
+
+5. (sami5.py) Executando novamente  script 2 fomos ver onde ficava a base da stack com o valor hexadecimal
+do ESP. e subtraindo ao valor do EIP ficamos com o NOPS
+Pelo que temos lido recomendam dar sempre uma folga maior ao nops do que a calculada.
+
+Por fim calculamos o shellcode com o comando
+
+msfpayload windows/shell_bind_tcp LPORT=4444 R | msfencode -c 1 -b "x00\x0a\x0d\xf1\x40" R
+
+Quando se corre o script o programa crasha na mesma
+e não é aberta porta nenhuma. E ai ta o problema pois assim nao se consegue adqurir controlo
+da maquina alvo pelo backTrak.
+
+o script samifinal é o que se encontra na base de dados dos exploits, apenas lhe alteramos o nome
+de utilizador que vinha
+mas qualquer das maneiras fica aqui o link http://www.exploit-db.com/exploits/24557/
+
